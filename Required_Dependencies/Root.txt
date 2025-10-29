@@ -1,0 +1,4 @@
+npm init -y
+npm install concurrently --save-dev
+npm start 
+npm run stop
