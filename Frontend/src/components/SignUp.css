@@ -5,6 +5,44 @@
   box-sizing: border-box;
 }
 
+/* 🔙 Back Button Styling */
+.back-btn {
+  background-color: transparent;
+  border: 2px solid #4caf50;
+  color: #4caf50;
+  padding: 8px 16px;
+  font-size: 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 15px;
+  margin-left: 10px;
+}
+
+.back-btn:hover {
+  background-color: #4caf50;
+  color: white;
+  transform: scale(1.03);
+}
+
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  color: #555;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.close-btn:hover {
+  color: #ff4d4f;
+  transform: scale(1.2);
+}
+
+
 /* ===== Signup Container ===== */
 .signup-container {
   min-height: 100vh;

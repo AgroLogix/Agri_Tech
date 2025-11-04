@@ -1,9 +1,14 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { FaTimes } from "react-icons/fa";
 import Login from "./Login";
 import "./SignUp.css";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const SignUp = () => {
+  const navigate = useNavigate();
   const [showLogin, setShowLogin] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -143,7 +148,7 @@ const SignUp = () => {
           "http://localhost:5000/api/auth/Signup",
           formData
         );
-        alert(res.data.message);
+        toast.success(res.data.message, { position: "top-right" });
 
         // Reset form
         setFormData({
@@ -156,8 +161,14 @@ const SignUp = () => {
           role: "",
         });
         setPasswordStrength("");
+        // ✅ Automatically open login popup after 2 seconds
+        setTimeout(() => {
+          setShowLogin(true);
+        }, 2000);
       } catch (err) {
-        alert(err.response?.data?.message || "Signup failed");
+        toast.error(err.response?.data?.message || "Signup failed", {
+          position: "top-right",
+        });
         console.error(err);
       }
     }
@@ -166,6 +177,13 @@ const SignUp = () => {
   return (
     <div className="signup-container">
       <div className="signup-box">
+         <button
+    className="close-btn"
+    onClick={() => navigate("/")}
+    title="Go to Home"
+  >
+    <FaTimes />
+  </button>
         <h2>Create Account</h2>
         <p className="subtitle">Sign up to get started</p>
 
@@ -359,7 +377,9 @@ const SignUp = () => {
           </p>
         </form>
       </div>
+
       {showLogin && <Login onClose={handleCloseModal} />}
+      <ToastContainer />
     </div>
   );
 };

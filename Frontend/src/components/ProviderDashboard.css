@@ -228,7 +228,7 @@ body {
   background: #f1f5f9;
   border-radius: 10px;
   padding: 1rem;
-  width: 220px;
+  width: 300px;
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
   transition: 0.3s;
 }
@@ -245,14 +245,65 @@ body {
   color: #f97316;
 }
 
-.vehicle-card.maintenance span {
+/* .vehicle-card.maintenance span {
   color: #ef4444;
-}
+} */
 
 .no-vehicles {
   color: #64748b;
   text-align: center;
   margin-top: 10px;
+}
+
+/* === Vehicle Image Box === */
+.vehicle-thumb {
+  width: 100%;
+  height: 200px;
+  object-fit: cover; /* ensures the image fills the box neatly without stretching */
+  border-bottom: 1px solid #eee;
+  background-color: #f8f8f8;
+}
+
+/* === Vehicle Info === */
+.vehicle-info {
+  padding: 10px 12px;
+  text-align: left;
+}
+
+.vehicle-info h4 {
+  font-size: 1.1rem;
+  color: #333;
+  margin: 5px 0;
+}
+
+.vehicle-info p {
+  font-size: 0.9rem;
+  color: #555;
+  margin: 3px 0;
+}
+
+/* === Vehicle Status === */
+.vehicle-status {
+  font-size: 0.9rem;
+  margin-top: 6px;
+}
+
+.vehicle-status span {
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.vehicle-status.available span {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.vehicle-status.booked span {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
 }
 
 /* ========== BOOKING SECTION ========== */
