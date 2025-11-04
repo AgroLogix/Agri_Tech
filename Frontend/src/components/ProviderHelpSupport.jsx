@@ -32,7 +32,7 @@ const ProviderHelpSupport = () => {
         <button className="back-btn" onClick={() => navigate("/provider")}>
           <FaArrowLeft /> Back
         </button>
-        <h2><FaQuestionCircle /> Help & Support</h2>
+        <h2 className="help"><FaQuestionCircle /> Help & Support</h2>
       </div>
 
       {/* ===== Search Section ===== */}

@@ -24,7 +24,10 @@
   gap: 8px;
   transition: background 0.3s ease;
 }
-
+.help{
+  position: absolute;
+  left: 43vw;
+}
 .back-btn:hover {
   background: #1b5e20;
 }
