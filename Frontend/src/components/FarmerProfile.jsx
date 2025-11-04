@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import {
   FaArrowLeft,
   FaEdit,
@@ -41,31 +42,65 @@ const FarmerProfile = () => {
     confirm: "",
   });
 
+  // 🧭 Load farmer data from backend
+  useEffect(() => {
+    const s = JSON.parse(localStorage.getItem("user")) || {};
+    if (!s.userId) return;
+    axios
+      .get(`http://localhost:5000/api/auth/farmer/${s.userId}`)
+      .then((res) => setUser(res.data))
+      .catch(() => setUser({ ...emptyUser, ...s }));
+  }, []);
+
   const onChange = (field, value) => {
     setUser((u) => ({ ...u, [field]: value }));
   };
 
-  const handleProfilePic = (e) => {
+  // 🖼️ Upload profile picture (optional)
+  const handleProfilePic = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      const updated = { ...user, profilePic: reader.result };
-      setUser(updated);
-      localStorage.setItem("user", JSON.stringify(updated));
-    };
-    reader.readAsDataURL(file);
+
+    const formData = new FormData();
+    formData.append("profilePic", file);
+
+    try {
+      const res = await axios.post(
+        `http://localhost:5000/api/auth/provider/${user.userId}/upload`, // ✅ reuse same upload route
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+
+      const updatedUser = { ...user, profilePic: res.data.profilePic };
+      setUser(updatedUser);
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      alert("Profile image uploaded successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("Image upload failed.");
+    }
   };
 
-  const handleSave = () => {
-    localStorage.setItem("user", JSON.stringify(user));
-    setEditing(false);
-    alert("Profile saved locally!");
+  // 💾 Save profile to MongoDB
+  const handleSave = async (e) => {
+    e?.preventDefault();
+    try {
+      await axios.put(
+        `http://localhost:5000/api/auth/farmer/${user.userId}`,
+        user
+      );
+      localStorage.setItem("user", JSON.stringify(user));
+      setEditing(false);
+      alert("Profile saved successfully to MongoDB.");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save profile. Check backend connection.");
+    }
   };
 
   const handleCancel = () => {
-    const stored = JSON.parse(localStorage.getItem("user")) || {};
-    setUser({ ...emptyUser, ...stored });
+    const s = JSON.parse(localStorage.getItem("user")) || {};
+    setUser({ ...emptyUser, ...s });
     setEditing(false);
   };
 
@@ -123,10 +158,7 @@ const FarmerProfile = () => {
 
       {/* Password Box */}
       {showPasswordBox && (
-        <form
-          className="farmer-password-box"
-          onSubmit={handlePasswordChange}
-        >
+        <form className="farmer-password-box" onSubmit={handlePasswordChange}>
           <div className="farmer-row">
             <label>New Password</label>
             <input
@@ -169,17 +201,17 @@ const FarmerProfile = () => {
         <div className="farmer-left-col">
           <div className="farmer-photo-wrap">
             <img
-              src={user.profilePic || "/default_profile.png"}
+              src={
+                user.profilePic
+                  ? `http://localhost:5000${user.profilePic}`
+                  : "/default_profile.png"
+              }
               alt="Profile"
               className="farmer-profile-photo"
             />
             {editing && (
               <label className="farmer-upload-overlay">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleProfilePic}
-                />
+                <input type="file" accept="image/*" onChange={handleProfilePic} />
                 <span>
                   <FaCamera /> Change
                 </span>
