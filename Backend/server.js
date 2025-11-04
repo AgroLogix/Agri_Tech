@@ -4,6 +4,10 @@ import cors from "cors";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import authRoutes from "./routes/authRoutes.js";
+import vehicleRoutes from "./routes/vehicleRoutes.js";
+import bookingRoutes from "./routes/bookingRoutes.js";
+import path from "path";
+
 
 dotenv.config();
 const app = express();
@@ -11,7 +15,11 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
+app.use("/uploads", express.static("uploads"));
+
 app.use("/api/auth", authRoutes);
+app.use("/api/vehicles", vehicleRoutes);
+app.use("/api/bookings", bookingRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI)
