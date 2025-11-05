@@ -8,6 +8,10 @@ import fs from "fs";
 const router = express.Router();
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 19ba1a5387f9ca11837f024270256ddfd0cc7b44
 // ================================
 // 📂 Multer Configuration
 // ================================
@@ -177,6 +181,7 @@ router.post("/provider/:userId/upload", upload.single("profilePic"), async (req,
   }
 });
 
+<<<<<<< HEAD
 // ================================
 // ✏️ Update Farmer Profile
 // ================================
@@ -212,5 +217,7 @@ router.get("/farmer/:userId", async (req, res) => {
 });
 
 
+=======
+>>>>>>> 19ba1a5387f9ca11837f024270256ddfd0cc7b44
 
 export default router;

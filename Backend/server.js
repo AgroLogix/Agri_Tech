@@ -6,6 +6,10 @@ import bodyParser from "body-parser";
 import authRoutes from "./routes/authRoutes.js";
 import vehicleRoutes from "./routes/vehicleRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
+<<<<<<< HEAD
+=======
+import path from "path";
+>>>>>>> 19ba1a5387f9ca11837f024270256ddfd0cc7b44
 
 
 dotenv.config();

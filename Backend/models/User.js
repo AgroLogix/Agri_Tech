@@ -22,7 +22,11 @@ const userSchema = new mongoose.Schema({
   aadhaar: String,
   pan: String,
   drivingLicense: String,
+<<<<<<< HEAD
 });
+=======
+}, { timestamps: true });
+>>>>>>> 19ba1a5387f9ca11837f024270256ddfd0cc7b44
 
 const User = mongoose.model("User", userSchema);
 export default User;
