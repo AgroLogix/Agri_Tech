@@ -24,7 +24,3 @@ const vehicleSchema = new mongoose.Schema(
 );
 
 export default mongoose.model("Vehicle", vehicleSchema);
-<<<<<<< HEAD
-=======
-
->>>>>>> 19ba1a5387f9ca11837f024270256ddfd0cc7b44

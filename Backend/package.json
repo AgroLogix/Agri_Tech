@@ -1,10 +1,14 @@
 {
   "name": "capstone_project",
+  "name": "capstone_project",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
   "type": "module",
+  "type": "module",
   "scripts": {
+    "start": "concurrently \"npm run dev --prefix frontend\" \"npm run dev --prefix backend\"",
+    "stop": "taskkill /F /IM node.exe || exit 0"
     "start": "concurrently \"npm run dev --prefix frontend\" \"npm run dev --prefix backend\"",
     "stop": "taskkill /F /IM node.exe || exit 0"
   },
@@ -24,6 +28,7 @@
 =======
 >>>>>>> 19ba1a5387f9ca11837f024270256ddfd0cc7b44
   "devDependencies": {
+    "concurrently": "^9.2.1"
     "concurrently": "^9.2.1"
   }
 }

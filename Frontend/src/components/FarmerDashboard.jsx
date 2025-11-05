@@ -30,6 +30,22 @@ const FarmerDashboard = () => {
   });
   const navigate = useNavigate();
 
+  const [dateTime, setDateTime] = useState(new Date());
+  const [greeting, setGreeting] = useState("");
+  const [bookings, setBookings] = useState([]);
+  const [vehicles, setVehicles] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedVehicle, setSelectedVehicle] = useState(null); // ✅ NEW
+  const [bookingData, setBookingData] = useState({
+    // ✅ NEW
+    productName: "",
+    quantity: "",
+    source: "",
+    destination: "",
+    deliveryDate: "",
+  });
+  const navigate = useNavigate();
+
   const user = JSON.parse(localStorage.getItem("user"));
 
   // Time update
@@ -529,3 +545,4 @@ const handleConfirmBooking = async (e) => {
 };
 
 export default FarmerDashboard;
+>>>>>>> b11ccf06738854771f55a7d69dd7f9420562d606
