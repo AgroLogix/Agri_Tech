@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "./ProviderProfile.css";
 import {
   FaArrowLeft,
@@ -8,7 +9,6 @@ import {
   FaCamera,
   FaTimes,
   FaKey,
-  FaUpload,
 } from "react-icons/fa";
 
 const emptyUser = {
@@ -24,12 +24,12 @@ const emptyUser = {
   addressLine: "",
   city: "",
   state: "",
+  district:"",
   pincode: "",
   baseLocation: "",
   aadhaar: "",
   pan: "",
   drivingLicense: "",
-  rcDocs: [], // array of { name, dataUrl }
 };
 
 const ProviderProfile = () => {
@@ -44,58 +44,64 @@ const ProviderProfile = () => {
     confirm: "",
   });
 
-  // keep local state in sync if localStorage changes externally
   useEffect(() => {
-    const s = JSON.parse(localStorage.getItem("user")) || {};
-    setUser((prev) => ({ ...emptyUser, ...s }));
-  }, []);
+  const s = JSON.parse(localStorage.getItem("user")) || {};
+  if (!s.userId) return;
+  axios.get(`http://localhost:5000/api/auth/provider/${s.userId}`)
+    .then(res => setUser(res.data))
+    .catch(() => setUser({ ...emptyUser, ...s }));
+}, []);
+
 
   const onChange = (field, value) => {
     setUser((u) => ({ ...u, [field]: value }));
   };
 
-  const handleProfilePic = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      onChange("profilePic", reader.result);
-    };
-    reader.readAsDataURL(file);
-  };
+  const handleProfilePic = async (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
 
-  const handleRcUpload = (e) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length === 0) return;
-    const readers = files.map(
-      (f) =>
-        new Promise((res) => {
-          const r = new FileReader();
-          r.onload = () => res({ name: f.name, dataUrl: r.result });
-          r.readAsDataURL(f);
-        })
+  const formData = new FormData();
+  formData.append("profilePic", file);
+
+  try {
+    const res = await axios.post(
+      `http://localhost:5000/api/auth/provider/${user.userId}/upload`,
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } }
     );
-    Promise.all(readers).then((arr) => {
-      onChange("rcDocs", [...(user.rcDocs || []), ...arr]);
-    });
-  };
 
-  const removeRcDoc = (index) => {
-    const newDocs = [...(user.rcDocs || [])];
-    newDocs.splice(index, 1);
-    onChange("rcDocs", newDocs);
-  };
+    // ✅ Update local storage + broadcast event
+    const updatedUser = { ...user, profilePic: res.data.profilePic };
+    setUser(updatedUser);
+    localStorage.setItem("user", JSON.stringify(updatedUser));
 
-  const handleSave = (e) => {
-    e?.preventDefault();
-    // persist to localStorage (replace with API call if available)
+    // 🔄 Notify other tabs/pages (e.g., ProviderDashboard)
+    window.dispatchEvent(new Event("storage"));
+
+    alert("Profile image uploaded successfully!");
+  } catch (err) {
+    console.error(err);
+    alert("Image upload failed. Check backend.");
+  }
+};
+
+
+  const handleSave = async (e) => {
+  e?.preventDefault();
+  try {
+    await axios.put(`http://localhost:5000/api/auth/provider/${user.userId}`, user);
     localStorage.setItem("user", JSON.stringify(user));
     setEditing(false);
-    alert("Profile saved locally (localStorage).");
-  };
+    alert("Profile saved successfully to MongoDB.");
+  } catch (err) {
+    console.error(err);
+    alert("Failed to save profile. Check server connection.");
+  }
+};
+
 
   const handleCancel = () => {
-    // revert to stored values
     const s = JSON.parse(localStorage.getItem("user")) || {};
     setUser({ ...emptyUser, ...s });
     setEditing(false);
@@ -103,7 +109,6 @@ const ProviderProfile = () => {
 
   const handlePasswordChange = (e) => {
     e.preventDefault();
-    // Basic check — in real app validate current password with server
     if (!passwords.newPassword) {
       alert("Please enter a new password.");
       return;
@@ -112,7 +117,6 @@ const ProviderProfile = () => {
       alert("New password and confirm mismatch.");
       return;
     }
-    // Save to local user object and storage
     onChange("password", passwords.newPassword);
     localStorage.setItem("user", JSON.stringify({ ...user, password: passwords.newPassword }));
     setPasswords({ current: "", newPassword: "", confirm: "" });
@@ -197,7 +201,11 @@ const ProviderProfile = () => {
         <div className="left-col">
           <div className="photo-wrap">
             <img
-              src={user.profilePic || user.image || "/default_profile.png"}
+              src={
+    user.profilePic
+      ? `http://localhost:5000${user.profilePic}`
+      : "/default_profile.png"
+  }
               alt="Profile"
               className="profile-photo"
             />
@@ -215,21 +223,20 @@ const ProviderProfile = () => {
             </h2>
             <p><strong>User ID:</strong> {user.userId || "AGX-PRV-XXXX"}</p>
             <p><strong>Base Location:</strong> {user.baseLocation || "N/A"}</p>
-            <p><strong>Total Vehicles:</strong> {/* optional - derive if you store vehicles */} N/A</p>
+            <p><strong>Total Vehicles:</strong> N/A</p>
             <p><strong>Avg Rating:</strong> ★ 0.0</p>
           </div>
         </div>
 
         <div className="right-col">
           <form className="profile-form" onSubmit={handleSave}>
-            {/* Personal */}
             <h3>Personal Information</h3>
             <div className="form-grid">
               <div className="form-group">
                 <label>Full Name</label>
                 <input
                   type="text"
-                  value={`${user.firstName || ""}`}
+                  value={user.firstName || ""}
                   onChange={(e) => onChange("firstName", e.target.value)}
                   placeholder="First name"
                   readOnly={!editing}
@@ -239,7 +246,7 @@ const ProviderProfile = () => {
                 <label>Last Name</label>
                 <input
                   type="text"
-                  value={`${user.lastName || ""}`}
+                  value={user.lastName || ""}
                   onChange={(e) => onChange("lastName", e.target.value)}
                   placeholder="Last name"
                   readOnly={!editing}
@@ -255,7 +262,6 @@ const ProviderProfile = () => {
                   placeholder="AGX-PRV-1024"
                 />
               </div>
-
               <div className="form-group">
                 <label>Gender</label>
                 <select
@@ -269,7 +275,6 @@ const ProviderProfile = () => {
                   <option>Other</option>
                 </select>
               </div>
-
               <div className="form-group">
                 <label>Date of Birth</label>
                 <input
@@ -279,7 +284,6 @@ const ProviderProfile = () => {
                   readOnly={!editing}
                 />
               </div>
-
               <div className="form-group">
                 <label>Contact Number</label>
                 <input
@@ -290,7 +294,6 @@ const ProviderProfile = () => {
                   readOnly={!editing}
                 />
               </div>
-
               <div className="form-group">
                 <label>Email</label>
                 <input
@@ -303,7 +306,6 @@ const ProviderProfile = () => {
               </div>
             </div>
 
-            {/* Address */}
             <h3>Address & Location</h3>
             <div className="form-grid">
               <div className="form-group wide">
@@ -316,7 +318,6 @@ const ProviderProfile = () => {
                   placeholder="21, Main Market Road"
                 />
               </div>
-
               <div className="form-group">
                 <label>City</label>
                 <input
@@ -326,7 +327,6 @@ const ProviderProfile = () => {
                   readOnly={!editing}
                 />
               </div>
-
               <div className="form-group">
                 <label>State</label>
                 <input
@@ -336,7 +336,15 @@ const ProviderProfile = () => {
                   readOnly={!editing}
                 />
               </div>
-
+              <div className="form-group">
+                <label>District</label>
+                <input
+                  type="text"
+                  value={user.district || ""}
+                  onChange={(e) => onChange("district", e.target.value)}
+                  readOnly={!editing}
+                />
+              </div>
               <div className="form-group">
                 <label>Pincode</label>
                 <input
@@ -346,7 +354,6 @@ const ProviderProfile = () => {
                   readOnly={!editing}
                 />
               </div>
-
               <div className="form-group wide">
                 <label>Base Location</label>
                 <input
@@ -359,8 +366,7 @@ const ProviderProfile = () => {
               </div>
             </div>
 
-            {/* Identification */}
-            <h3>Identification & Documents</h3>
+            <h3>Identification</h3>
             <div className="form-grid">
               <div className="form-group">
                 <label>Aadhaar Number</label>
@@ -372,7 +378,6 @@ const ProviderProfile = () => {
                   placeholder="XXXX-XXXX-1234"
                 />
               </div>
-
               <div className="form-group">
                 <label>PAN Number</label>
                 <input
@@ -383,7 +388,6 @@ const ProviderProfile = () => {
                   placeholder="ABCPK1234F"
                 />
               </div>
-
               <div className="form-group">
                 <label>Driving Licence</label>
                 <input
@@ -393,46 +397,8 @@ const ProviderProfile = () => {
                   readOnly={!editing}
                 />
               </div>
-
-              <div className="form-group wide">
-                <label>RC Documents (upload)</label>
-                <div className="rc-upload">
-                  <label className={`rc-btn ${editing ? "" : "disabled"}`}>
-                    <input
-                      type="file"
-                      accept="image/*,.pdf"
-                      multiple
-                      onChange={handleRcUpload}
-                      disabled={!editing}
-                    />
-                    <FaUpload /> {editing ? "Upload RC / Docs" : "View uploaded"}
-                  </label>
-
-                  <div className="rc-list">
-                    {(user.rcDocs || []).length === 0 ? (
-                      <p className="muted">No documents uploaded.</p>
-                    ) : (
-                      (user.rcDocs || []).map((d, i) => (
-                        <div key={i} className="rc-item">
-                          <span className="rc-name">{d.name}</span>
-                          {editing && (
-                            <button
-                              type="button"
-                              className="rc-remove"
-                              onClick={() => removeRcDoc(i)}
-                            >
-                              Remove
-                            </button>
-                          )}
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              </div>
             </div>
 
-            {/* Buttons shown in edit mode only at bottom as well */}
             {editing && (
               <div className="form-actions-bottom">
                 <button type="submit" className="btn-primary">Save Profile</button>
