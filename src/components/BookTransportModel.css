@@ -1,0 +1,24 @@
+/* BookTransportModal.css */
+
+.btm-form input {
+  box-sizing: border-box;
+}
+
+.btm-form label {
+  font-size: 13px;
+  color: #6b6b6b;
+}
+
+.btm-actions .btm-button {
+  min-width: 100px;
+}
+.btm-button.primary {
+  background: linear-gradient(180deg, var(--green-mid), var(--green-dark));
+  color: white;
+  border: none;
+}
+.btm-button.outline {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid #e6eed6;
+}
