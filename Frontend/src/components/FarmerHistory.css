@@ -1,0 +1,90 @@
+.farmer-history-page {
+  padding: 20px 40px;
+  font-family: "Poppins", sans-serif;
+  background: #f9fcf9;
+  min-height: 100vh;
+}
+
+.farmer-history-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.farmer-history-header h2 {
+  color: #2e7d32;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.farmer-back-btn {
+  background: #3b853f;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.3s ease;
+}
+
+.farmer-back-btn:hover {
+  background: #1b5e20;
+}
+
+.farmer-history-table-container {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  overflow-x: auto;
+}
+
+.farmer-history-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.farmer-history-table th,
+.farmer-history-table td {
+  border-bottom: 1px solid #e0e0e0;
+  padding: 12px 10px;
+  text-align: left;
+}
+
+.farmer-history-table th {
+  background: #e8f5e9;
+  color: #1b5e20;
+  font-weight: 600;
+}
+
+.farmer-history-table tr:hover {
+  background: #f1f8f5;
+}
+
+.farmer-status-badge {
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: capitalize;
+}
+
+.farmer-accepted {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.farmer-pending {
+  background: #fff7ed;
+  color: #b45309;
+}
+
+.farmer-completed {
+  background: #e0f2fe;
+  color: #1e3a8a;
+}

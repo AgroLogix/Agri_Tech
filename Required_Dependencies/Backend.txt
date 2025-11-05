@@ -2,3 +2,4 @@ npm init -y
 npm install express mongoose cors dotenv body-parser bcryptjs
 Remove-Item -Recurse -Force node_modules, package-lock.json
 npm install --save-dev nodemon
+npm install multer
